@@ -2,6 +2,7 @@ const {Router} = require('express')
 const db = require('./userDb')
 const {comparePassword, hashPassword} = require('./bcrypt')
 const jwt = require('jsonwebtoken')
+const {auth} = require('./middleware/auth')
 
 const router = Router()
 
@@ -9,11 +10,33 @@ const router = Router()
 router.get('/notes', (req, res) => {
     //get notes
 })
-router.post('/notes', (req, res) => {
-    //spara en antäckning
-})
-router.put('/notes', (req, res) => {
-    //ändra en antäckning
+router.post('/notes', auth, async (req, res) => {
+    try {
+        const { title, text } = req.body;
+
+        //insert the new note into the user object
+        const newNote = await db.insertNote(req.user.id, title, text);
+
+        res.status(201).json({ message: 'Note created successfully', note: newNote });
+    } catch (error) {
+        console.error('Error creating note:', error);
+        res.status(500).json({ error: 'An error occurred while creating the note' });
+    }
+});
+//ändra en antäckning
+router.put('/notes', auth, async (req, res) => {
+    try {
+        const { oldTitle, newTitle, newText } = req.body;
+
+        //modify note
+        const modifiedNote = await db.modifyNote(req.user.id, oldTitle, newTitle, newText);
+
+        res.status(200).json({ message: 'Note updated successfully', note: modifiedNote });
+    } catch (error) {
+        console.error('Error updating note:', error);
+        res.status(500).json({ error: 'An error occurred while updating the note' });
+    }
+
 })
 router.delete('/notes', (req, res) => {
     //ta bort en antäckning
