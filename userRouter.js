@@ -7,14 +7,16 @@ const {auth} = require('./middleware/auth')
 const router = Router()
 
 //endpoints
-router.get('/notes', (req, res) => {
-    //get notes
+router.get('/notes', auth, async (req, res) => {
+
+    const notes = await db.getNotes(req.user.id)
+
+    res.status(201).json({ message: 'Notes displayed succesfully', note: notes });
 })
 router.post('/notes', auth, async (req, res) => {
     try {
         const { title, text } = req.body;
 
-        //insert the new note into the user object
         const newNote = await db.insertNote(req.user.id, title, text);
 
         res.status(201).json({ message: 'Note created successfully', note: newNote });
@@ -38,8 +40,18 @@ router.put('/notes', auth, async (req, res) => {
     }
 
 })
-router.delete('/notes', (req, res) => {
-    //ta bort en antäckning
+//ta bort en antäckning
+router.delete('/notes', auth, async (req, res) => {
+    try {
+        const { title } = req.body;
+
+        const deletedNote = await db.deleteNote(req.user.id, title);
+
+        res.status(200).json({ message: 'Note deleted successfully', deletedNote });
+    } catch (error) {
+        console.error('Error deleting note:', error);
+        res.status(500).json({ error: 'An error occurred while deleting the note' });
+    }
 })
 router.post('/user/signup', async (req, res) => {
     //skapa konto
@@ -68,7 +80,7 @@ router.post('/user/login', async (req, res) => {
     }
     const matchingPassword = await comparePassword(password, user.password)
     if(matchingPassword){
-        const token = jwt.sign({id: user._id}, process.env.JWT_SECRET, {expiresIn: 300})
+        const token = jwt.sign({id: user._id}, process.env.JWT_SECRET, {expiresIn: 600})
         let result = {
             token: token
         }
@@ -77,11 +89,24 @@ router.post('/user/login', async (req, res) => {
     else{
         res.status(401).json({error: 'wrong password!'})
     }
-
-
 })
-router.get('/notes/search', (req, res) => {
-    //sök bland anteckningar
+router.get('/notes/search', auth, async (req, res) => {
+    //sök bland anteckning
+    //har bara använt body så körde query här för skojs skull
+    //url i postman kan se ut såhär om man har space i titeln http://localhost:8000/api/notes/search?titel=mitt%20exempel
+    const {titel} = req.query;
+    try {
+        const searchedNote = await db.findNote(titel);
+
+        if (searchedNote) {
+            res.status(200).json({message: 'Note found', note: searchedNote});
+        } else {
+            res.status(404).json({message: 'Note not found'});
+        }
+    } catch (error) {
+        console.error('Error searching for note:', error);
+        res.status(500).json({message: 'Error searching for the note'});
+    }
 })
 
 module.exports = router;

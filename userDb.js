@@ -40,14 +40,14 @@ const insertNote = async (userId, title, text) => {
             createdAt: formattedDate
         };
         //om min user har notes arrayen redan pusha i den annars skapa ny array
-        if (!user.notes) {
-            user.notes = [newNote];
-        } else { user.notes.push(newNote); }
+        if (!user.note) {
+            user.note = [newNote];
+        } else { user.note.push(newNote); }
 
         //updatera användaren
         await db.update({ _id: userId }, user);
 
-        //returnere note
+        //returnera note
         return newNote;
     } catch (error) {
         console.error('Error inserting note:', error);
@@ -66,26 +66,65 @@ const modifyNote = async (userId, oldTitle, newTitle, newText) => {
             throw new Error('User not found');
         }
 
-        const noteIndex = user.notes.findIndex(note => note.title === oldTitle);
+        const noteIndex = user.note.findIndex(note => note.title === oldTitle);
         if (noteIndex === -1) {
             throw new Error('Note not found');
         }
 
         //update the note
-        if (newTitle) user.notes[noteIndex].title = newTitle;
-        if (newText) user.notes[noteIndex].text = newText;
+        if (newTitle) user.note[noteIndex].title = newTitle;
+        if (newText) user.note[noteIndex].text = newText;
 
         //my modified date
-        user.notes[noteIndex].modifiedAt = formattedDate;
+        user.note[noteIndex].modifiedAt = formattedDate;
 
         await db.update({ _id: userId }, user);
 
-        return user.notes[noteIndex];
+        return user.note[noteIndex];
     } catch (error) {
         console.error('Error modifying note:', error);
         throw error;
     }
 };
+//get all user notes
+const getNotes = async (userId) => {
+    const user = await db.findOne({ _id: userId });
+    return user.note
+}
+const deleteNote = async (userId, title) => {
+    try {
+        const user = await db.findOne({ _id: userId });
+        if (!user) {
+            throw new Error('User not found');
+        }
 
+        const noteIndex = user.note.findIndex(note => note.title === title);
+        if (noteIndex === -1) {
+            throw new Error('Note not found');
+        }
 
-module.exports = {saveUser, findUser, insertNote, modifyNote}
+        const deletedNote = user.note.splice(noteIndex, 1)[0];
+
+        await db.update({ _id: userId }, user);
+
+        return deletedNote;
+    } catch (error) {
+        console.error('Error deleting note:', error);
+        throw error;
+    }
+}
+const findNote = async (title) => {
+    try {
+        const user = await db.findOne({}); 
+        if (!user || !user.note) {
+            return null;
+        }
+        const note = user.note.find(note => note.title === title);
+        return note || null;
+    } catch (error) {
+        console.error('Error finding note:', error);
+        throw error;
+    }
+};
+
+module.exports = {saveUser, findUser, insertNote, modifyNote, getNotes, deleteNote, findNote}
