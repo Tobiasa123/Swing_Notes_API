@@ -71,11 +71,9 @@ const modifyNote = async (userId, oldTitle, newTitle, newText) => {
             throw new Error('Note not found');
         }
 
-        //update the note
         if (newTitle) user.note[noteIndex].title = newTitle;
         if (newText) user.note[noteIndex].text = newText;
 
-        //my modified date
         user.note[noteIndex].modifiedAt = formattedDate;
 
         await db.update({ _id: userId }, user);

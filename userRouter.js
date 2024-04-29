@@ -11,7 +11,7 @@ router.get('/notes', auth, async (req, res) => {
 
     const notes = await db.getNotes(req.user.id)
 
-    res.status(201).json({ message: 'Notes displayed succesfully', note: notes });
+    res.status(200).json({ message: 'Notes displayed succesfully', note: notes });
 })
 router.post('/notes', auth, async (req, res) => {
     try {
@@ -33,7 +33,7 @@ router.put('/notes', auth, async (req, res) => {
         //modify note
         const modifiedNote = await db.modifyNote(req.user.id, oldTitle, newTitle, newText);
 
-        res.status(200).json({ message: 'Note updated successfully', note: modifiedNote });
+        res.status(201).json({ message: 'Note updated successfully', note: modifiedNote });
     } catch (error) {
         console.error('Error updating note:', error);
         res.status(500).json({ error: 'An error occurred while updating the note' });

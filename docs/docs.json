@@ -1,0 +1,468 @@
+{
+    "openapi": "3.1.0",
+    "info": {
+        "description": "Note editor API",
+        "title": "Swing Notes API",
+        "version": "1.0.0"
+    },
+    "paths": {
+        "/api/notes": {
+          "get": {
+            "description": "Get all user notes for user",
+            "responses": {
+              "200": {
+                "description": "Successful operation",
+                "content": {
+                  "application/json": {
+                    "schema": {
+                      "type": "object",
+                      "properties": {
+                        "message": {
+                          "type": "string",
+                          "description": "A message indicating the status of the request."
+                        },
+                        "note": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "string",
+                                "description": "The ID of the note."
+                              },
+                              "title": {
+                                "type": "string",
+                                "description": "The title of the note."
+                              },
+                              "text": {
+                                "type": "string",
+                                "description": "The text content of the note."
+                              },
+                              "createdAt": {
+                                "type": "string",
+                                "format": "date-time",
+                                "description": "The timestamp when the note was created."
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "post": {
+            "description": "Create a new note",
+            "responses": {
+              "201": {
+                "description": "Successful operation",
+                "content": {
+                  "application/json": {
+                    "schema": {
+                      "type": "object",
+                      "properties": {
+                        "message": {
+                          "type": "string",
+                          "description": "A message indicating the status of the request."
+                        },
+                        "note": {
+                          "type": "object",
+                          "properties": {
+                            "id": {
+                                "type": "string",
+                                "description": "The ID of the newly created note."
+                              },
+                            "title": {
+                              "type": "string",
+                              "description": "The title of the newly created note."
+                            },
+                            "text": {
+                              "type": "string",
+                              "description": "The text content of the newly created note."
+                            },
+                            "createdAt": {
+                                "type": "string",
+                                "format": "date-time",
+                                "description": "The timestamp when the note was created."
+                              }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "500": {
+                "description": "An error occurred while creating the note",
+                "content": {
+                  "application/json": {
+                    "schema": {
+                      "type": "object",
+                      "properties": {
+                        "error": {
+                          "type": "string",
+                          "description": "A message indicating the error."
+                        }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "put": {
+          "description": "Update an existing note",
+          "responses": {
+            "201": {
+              "description": "Successful operation",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "message": {
+                        "type": "string",
+                        "description": "A message indicating the status of the request."
+                      },
+                      "note": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "description": "The ID of the updated note."
+                          },
+                          "title": {
+                            "type": "string",
+                            "description": "The updated title of the note."
+                          },
+                          "text": {
+                            "type": "string",
+                            "description": "The updated text content of the note."
+                          },
+                          "modifiedAt": {
+                            "type": "string",
+                            "format": "date-time",
+                            "description": "The timestamp when the note was modified."
+                          }
+                        },
+                        "required": ["id", "title", "text", "modifiedAt"]
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "500": {
+              "description": "An error occurred while updating the note",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "error": {
+                        "type": "string",
+                        "description": "A message indicating the error."
+                    }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "delete": {
+      "description": "Delete a note",
+      "responses": {
+        "200": {
+          "description": "Successful operation",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "message": {
+                    "type": "string",
+                    "description": "A message indicating the status of the request."
+                  },
+                  "deletedNote": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "description": "The ID of the deleted note."
+                      },
+                      "title": {
+                        "type": "string",
+                        "description": "The title of the deleted note."
+                      },
+                      "text": {
+                        "type": "string",
+                        "description": "The text content of the deleted note."
+                      },
+                      "createdAt": {
+                        "type": "string",
+                        "format": "date-time",
+                        "description": "The timestamp when the note was created."
+                      }
+                    },
+                    "required": ["id", "title", "text", "createdAt"]
+                  }
+                },
+                "required": ["message", "deletedNote"]
+              }
+            }
+          }
+        },
+        "500": {
+          "description": "An error occurred while deleting the note",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "error": {
+                    "type": "string",
+                    "description": "A message indicating the error."
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },    
+  "/api/user/signup": {
+    "post": {
+      "description": "Create a new user account",
+      "responses": {
+        "200": {
+          "description": "Successful operation",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "message": {
+                    "type": "string",
+                    "description": "A message indicating the status of the request."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "409": {
+          "description": "Conflict - User already exists",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "error": {
+                    "type": "string",
+                    "description": "A message indicating that the user already exists."
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "requestBody": {
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "username": {
+                  "type": "string",
+                  "description": "The username of the new user."
+                },
+                "password": {
+                  "type": "string",
+                  "description": "The password of the new user."
+                }
+              },
+              "required": ["username", "password"]
+            }
+          }
+        }
+      }
+    }
+  },
+  "/api/user/login": {
+    "post": {
+      "description": "Authenticate user and generate access token",
+      "responses": {
+        "200": {
+          "description": "Successful operation",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "token": {
+                    "type": "string",
+                    "description": "JWT token for authentication."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "401": {
+          "description": "Unauthorized - Wrong password or username",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "error": {
+                    "type": "string",
+                    "description": "A message indicating the error."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "404": {
+          "description": "Not found - User does not exist",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "error": {
+                    "type": "string",
+                    "description": "A message indicating that the user does not exist."
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "requestBody": {
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "username": {
+                  "type": "string",
+                  "description": "The username of the user."
+                },
+                "password": {
+                  "type": "string",
+                  "description": "The password of the user."
+                }
+              },
+              "required": ["username", "password"]
+            }
+          }
+        }
+      }
+    }
+  },
+  "/api/notes/search": {
+    "get": {
+      "description": "Search for a note by its title",
+      "parameters": [
+        {
+          "name": "title",
+          "in": "query",
+          "description": "The title of the note to search for",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Successful operation",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "message": {
+                    "type": "string",
+                    "description": "A message indicating the status of the request."
+                  },
+                  "note": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "description": "The ID of the note."
+                      },
+                      "title": {
+                        "type": "string",
+                        "description": "The title of the note."
+                      },
+                      "text": {
+                        "type": "string",
+                        "description": "The text content of the note."
+                      },
+                      "createdAt": {
+                        "type": "string",
+                        "format": "date-time",
+                        "description": "The timestamp when the note was created."
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "404": {
+          "description": "Note not found",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "message": {
+                    "type": "string",
+                    "description": "A message indicating that the note was not found."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "500": {
+          "description": "Internal Server Error",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "message": {
+                    "type": "string",
+                    "description": "A message indicating an internal server error."
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+}
+
+
+
+
+
+ 
