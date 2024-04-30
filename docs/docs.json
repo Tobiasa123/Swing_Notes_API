@@ -148,6 +148,11 @@
                             "type": "string",
                             "description": "The updated text content of the note."
                           },
+                          "createdAt": {
+                            "type": "string",
+                            "format": "date-time",
+                            "description": "The timestamp when the note was created."
+                          },
                           "modifiedAt": {
                             "type": "string",
                             "format": "date-time",
