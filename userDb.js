@@ -1,8 +1,8 @@
 const Datastore = require('nedb-promise')
 const { v4: uuidv4 } = require('uuid');
-
-
 const db = new Datastore({filename: 'users.db', autoload: true})
+
+//här ligger olika funktioner för som används i userRouter
 
 const saveUser = (username, password) => {
     db.insert({
@@ -10,11 +10,12 @@ const saveUser = (username, password) => {
         password: password
     })
 }
+//hitta en user
 const findUser = (username) => {
     return db.findOne({username: username})
 }
+//posta en ny note med alla notes egenskaper
 const insertNote = async (userId, title, text) => {
-
     //definera max längd enligt specifikation
     if (title.length > 50) {
         throw new Error('Title exceeds maximum length of 50 characters');
@@ -24,6 +25,7 @@ const insertNote = async (userId, title, text) => {
     }
 
     const noteId = uuidv4();
+
     const currentDate = new Date();
     //formattera date så det blir läsbart
     const formattedDate = `${currentDate.getFullYear()}-${(currentDate.getMonth() + 1).toString().padStart(2, '0')}-${currentDate.getDate().toString().padStart(2, '0')} ${currentDate.getHours().toString().padStart(2, '0')}:${currentDate.getMinutes().toString().padStart(2, '0')}`;
@@ -54,6 +56,8 @@ const insertNote = async (userId, title, text) => {
         throw error;
     }
 };
+//modifiera en note, man söker via titel
+//i bodyn skickar man in oldTitle, newTitle och newText 
 const modifyNote = async (userId, oldTitle, newTitle, newText) => {
 
     const currentDate = new Date();
@@ -71,11 +75,13 @@ const modifyNote = async (userId, oldTitle, newTitle, newText) => {
             throw new Error('Note not found');
         }
 
+        //detta är egenskaperna man vill kunna ändra
         if (newTitle) user.note[noteIndex].title = newTitle;
         if (newText) user.note[noteIndex].text = newText;
 
         user.note[noteIndex].modifiedAt = formattedDate;
 
+        //uppdatera notes 
         await db.update({ _id: userId }, user);
 
         return user.note[noteIndex];
@@ -84,11 +90,12 @@ const modifyNote = async (userId, oldTitle, newTitle, newText) => {
         throw error;
     }
 };
-//get all user notes
+//get alla notes för användaren
 const getNotes = async (userId) => {
     const user = await db.findOne({ _id: userId });
     return user.note
 }
+//radera en note via titel
 const deleteNote = async (userId, title) => {
     try {
         const user = await db.findOne({ _id: userId });
@@ -111,6 +118,7 @@ const deleteNote = async (userId, title) => {
         throw error;
     }
 }
+//hitta en note från användaren
 const findNote = async (title) => {
     try {
         const user = await db.findOne({}); 

@@ -7,12 +7,19 @@ const {auth} = require('./middleware/auth')
 const router = Router()
 
 //endpoints
+
+//get notes för user
 router.get('/notes', auth, async (req, res) => {
+    try {
+        const notes = await db.getNotes(req.user.id);
+        res.status(200).json({ message: 'Notes displayed successfully', notes: notes });
 
-    const notes = await db.getNotes(req.user.id)
-
-    res.status(200).json({ message: 'Notes displayed succesfully', note: notes });
+    } catch (error) {
+        console.error('Error fetching notes:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
 })
+//posta en ny note
 router.post('/notes', auth, async (req, res) => {
     try {
         const { title, text } = req.body;
@@ -53,47 +60,52 @@ router.delete('/notes', auth, async (req, res) => {
         res.status(500).json({ error: 'An error occurred while deleting the note' });
     }
 })
+//skapa konto
 router.post('/user/signup', async (req, res) => {
-    //skapa konto
-    const {username, password} = req.body;
-
-    const hashedPassword = await hashPassword(password)
-
-    const user = await db.findUser(username)
-    if (user){
-        res.status(409).json({ error: 'User already exists' });
-        return
-    }
-
-    db.saveUser(username, hashedPassword)
-    res.status(200).json({ message: 'New user saved!'})
-
-})
-router.post('/user/login', async (req, res) => {
-    //logga in, måste vara inloggad för att göra notes
-    const {username, password} = req.body;
-    const user = await db.findUser(username)
-
-    if(user == null){
-        res.status(404).json({error: 'user not found'})
-        return
-    }
-    const matchingPassword = await comparePassword(password, user.password)
-    if(matchingPassword){
-        const token = jwt.sign({id: user._id}, process.env.JWT_SECRET, {expiresIn: 600})
-        let result = {
-            token: token
+    try {
+        const {username, password} = req.body;
+        const hashedPassword = await hashPassword(password)
+        const user = await db.findUser(username)
+        if (user){
+            res.status(409).json({ error: 'User already exists' });
+            return
         }
-        res.status(200).json(result)
+        db.saveUser(username, hashedPassword)
+        res.status(200).json({ message: 'New user saved!'})
+    } catch (error){
+            console.error('Error signing up user:', error)
+            res.status(500).json({error: 'internal server error'})
     }
-    else{
-        res.status(401).json({error: 'wrong password!'})
+})
+//logga in, måste vara inloggad för att skapa notes
+router.post('/user/login', async (req, res) => {
+
+    try {
+        const {username, password} = req.body;
+        const user = await db.findUser(username)
+        if(user == null){
+            res.status(404).json({error: 'user not found'})
+            return
+        }
+        const matchingPassword = await comparePassword(password, user.password)
+        if(matchingPassword){
+            const token = jwt.sign({id: user._id}, process.env.JWT_SECRET, {expiresIn: 600})
+            let result = {
+                token: token
+            }
+            res.status(200).json(result)
+        }
+        else{
+            res.status(401).json({error: 'wrong password!'})
+    }
+    } catch (error){
+        res.status(500).json({ error: 'Internal Server Error' });
     }
 })
 router.get('/notes/search', auth, async (req, res) => {
     //sök bland anteckning
-    //har bara använt body så körde query här för skojs skull
-    //url i postman kan se ut såhär om man har space i titeln http://localhost:8000/api/notes/search?titel=mitt%20exempel
+    //har bara använt request bodyn så körde query här för skojs skull
+    //url i postman kan se ut såhär om till exempel har space i titeln http://localhost:8000/api/notes/search?titel=mitt%20exempel
     const {titel} = req.query;
     try {
         const searchedNote = await db.findNote(titel);

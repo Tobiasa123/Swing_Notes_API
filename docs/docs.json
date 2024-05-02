@@ -176,14 +176,44 @@
                       "error": {
                         "type": "string",
                         "description": "A message indicating the error."
+                      }
                     }
+                  }
+                }
+              }
+            }
+          },
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "oldTitle": {
+                      "type": "string",
+                      "description": "The current title of the note to be updated."
+                    },
+                    "newTitle": {
+                      "type": "string",
+                      "description": "The new title to replace the current title."
+                    },
+                    "newText": {
+                      "type": "string",
+                      "description": "The new text content to replace the current text content."
+                    }
+                  },
+                  "required": ["oldTitle", "newTitle", "newText"],
+                  "example": {
+                    "oldTitle": "Current Title",
+                    "newTitle": "Updated Title",
+                    "newText": "Updated Text Content"
+                  }
                 }
               }
             }
           }
-        }
-      }
-    },
+        },
     "delete": {
       "tags": ["Notes"],
       "description": "Radera en användares note via titel",

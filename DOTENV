@@ -1,1 +1,1 @@
-JWT_SECRET = 'should be in .env' 
+JWT_SECRET = 'should be in .env file' 
